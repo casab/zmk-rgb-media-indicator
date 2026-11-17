@@ -1,0 +1,7 @@
+# Media key LED indicator for ZMK (see README.md).
+
+config ZMK_RGB_MEDIA_INDICATOR
+    bool
+    default y
+    depends on DT_HAS_ZMK_RGB_MEDIA_INDICATOR_ENABLED
+    depends on ZMK_RGB_LED_OVERLAY

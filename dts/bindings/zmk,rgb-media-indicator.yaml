@@ -1,0 +1,30 @@
+# Copyright (c) 2026 Engin Al
+# SPDX-License-Identifier: MIT
+
+description: |
+  Short LED animations for media and screen-brightness keys: next/previous sweep across the board,
+  volume up/down grow from or shrink to the center, play/pause pulses `pulse-leds`.
+  Needs zmk-rgb-led-overlay (give it `led-x` for even motion).
+
+compatible: "zmk,rgb-media-indicator"
+
+properties:
+  color-hsb:
+    type: array
+    default: [175, 100, 50]
+    description: Media key color, hue (0-360), saturation, brightness (0-100). Default teal.
+  brightness-color-hsb:
+    type: array
+    default: [35, 100, 50]
+    description: Screen-brightness key color. Default amber.
+  pulse-leds:
+    type: array
+    description: LEDs that pulse for play/pause, e.g. the center one.
+  duration-ms:
+    type: int
+    default: 350
+    description: Length of each animation.
+  slot:
+    type: int
+    default: 4
+    description: zmk-rgb-led-overlay slot; higher slots are drawn over lower ones.
