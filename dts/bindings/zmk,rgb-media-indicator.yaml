@@ -20,6 +20,11 @@ properties:
   pulse-leds:
     type: array
     description: LEDs that pulse for play/pause, e.g. the center one.
+  skip-leds:
+    type: array
+    description: |
+      LEDs left out of the sweeps and rings (next/previous, volume, brightness), e.g. a center LED.
+      Their positions still shape the motion. Doesn't affect pulse-leds.
   duration-ms:
     type: int
     default: 350

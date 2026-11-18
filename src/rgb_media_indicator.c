@@ -12,6 +12,7 @@
  *   volume down     a band shrinks from the edges inwards
  *   play/pause      `pulse-leds` fade in and out once
  *   brightness +/-  like volume, in `brightness-color-hsb`
+ * Sweeps and rings leave out `skip-leds` (for example a center LED that looks odd lit alone).
  * Drawn through zmk-rgb-led-overlay.
  */
 
@@ -44,24 +45,48 @@ BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(DT_DRV_COMPAT) == 1,
 #if DT_NODE_HAS_PROP(NODE, pulse_leds)
 static const uint8_t pulse_leds[] = DT_PROP(NODE, pulse_leds);
 #endif
-
-static uint32_t pulse_mask(void) {
-    uint32_t mask = 0;
-#if DT_NODE_HAS_PROP(NODE, pulse_leds)
-    for (size_t i = 0; i < ARRAY_SIZE(pulse_leds); i++) {
-        mask |= BIT(pulse_leds[i]);
-    }
+#if DT_NODE_HAS_PROP(NODE, skip_leds)
+static const uint8_t skip_leds[] = DT_PROP(NODE, skip_leds);
 #endif
+
+static __maybe_unused uint32_t mask_of(const uint8_t *leds, size_t len) {
+    uint32_t mask = 0;
+    for (size_t i = 0; i < len; i++) {
+        mask |= BIT(leds[i]);
+    }
     return mask;
 }
 
+// play/pause: only `pulse-leds`.
+static uint32_t pulse_mask(void) {
+#if DT_NODE_HAS_PROP(NODE, pulse_leds)
+    return mask_of(pulse_leds, ARRAY_SIZE(pulse_leds));
+#else
+    return 0;
+#endif
+}
+
+// Sweeps and rings: every LED except `skip-leds` (0 means all).
+static uint32_t motion_mask(void) {
+#if DT_NODE_HAS_PROP(NODE, skip_leds)
+    return ~mask_of(skip_leds, ARRAY_SIZE(skip_leds));
+#else
+    return 0;
+#endif
+}
+
 static void play(enum zmk_led_overlay_anim_type type, struct led_rgb color) {
+    bool pulse = type == ZMK_LED_OVERLAY_ANIM_PULSE;
     struct zmk_led_overlay_anim anim = {
         .type = type,
         .color = color,
         .duration_ms = DURATION_MS,
-        .leds = type == ZMK_LED_OVERLAY_ANIM_PULSE ? pulse_mask() : 0,
+        .leds = pulse ? pulse_mask() : motion_mask(),
     };
+
+    if (pulse && anim.leds == 0) {
+        return; // no pulse-leds: play/pause shows nothing
+    }
 
     zmk_led_overlay_animate(SLOT, &anim);
 }

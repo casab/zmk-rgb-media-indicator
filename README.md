@@ -41,7 +41,8 @@ give that module `led-x` so the motion follows the LEDs' real positions.
            compatible = "zmk,rgb-media-indicator";
            color-hsb = <175 100 50>;             // teal
            brightness-color-hsb = <35 100 50>;   // amber
-           pulse-leds = <10>;                    // the center LED
+           pulse-leds = <10>;                    // the center LED pulses for play/pause
+           skip-leds = <10>;                     // ...and stays out of sweeps and rings
        };
    };
    ```
@@ -53,6 +54,7 @@ give that module `led-x` so the motion follows the LEDs' real positions.
 | `color-hsb` | array | `<175 100 50>` | Media key color (teal). |
 | `brightness-color-hsb` | array | `<35 100 50>` | Screen-brightness key color (amber). |
 | `pulse-leds` | array | none | LEDs that pulse for play/pause. |
+| `skip-leds` | array | none | LEDs left out of the sweeps and rings; their positions still shape the motion. |
 | `duration-ms` | int | 350 | Length of each animation. |
 | `slot` | int | 4 | zmk-rgb-led-overlay slot; higher slots are drawn over lower ones. |
 
